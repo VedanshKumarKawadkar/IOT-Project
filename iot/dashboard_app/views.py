@@ -15,7 +15,8 @@ import bcrypt
 def dashboard(request):
     username = request.session["username"]
     email = request.session["email"]
-    return render(request, "index.html")
+    return render(request, "dashboard.html")
+
 
 def login(request):
     if(request.method == "POST"):
@@ -33,7 +34,7 @@ def login(request):
                 print(username)
                 request.session["email"] = email
                 request.session["username"] = username
-                return render(request, "index.html")
+                return render(request, "dashboard.html")
             else:
                 
                 return JsonResponse({"msg":"Incorrect Password."})
@@ -69,7 +70,7 @@ def signup(request):
 
                 newuser.save()
 
-                return JsonResponse({"msg":"New User Created!!"})
+                return JsonResponse({"msg":"New User Created!!"}, safe=False)
 
 
 def login_signup_page(request):

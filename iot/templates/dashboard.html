@@ -8,6 +8,10 @@
   <title>Search</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"
+        integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -209,7 +213,8 @@
           </div>
         </div>
         <div class="graph">
-          <img src="https://i.stack.imgur.com/cPiLL.png" alt="Temperature Graph" />
+          {% comment %} <img src="https://i.stack.imgur.com/cPiLL.png" alt="Temperature Graph" /> {% endcomment %}
+          <canvas id="myChart1" width="200" height="60"></canvas>
         </div>
       </div>
 
@@ -227,7 +232,9 @@
           </div>
         </div>
         <div class="graph">
-          <img src="https://i.stack.imgur.com/cPiLL.png" alt="pH Graph" />
+          {% comment %} <img src="https://i.stack.imgur.com/cPiLL.png" alt="pH Graph" /> {% endcomment %}
+          <canvas id="myChart2" width="200" height="60"></canvas>
+
         </div>
       </div>
 
@@ -245,7 +252,9 @@
           </div>
         </div>
         <div class="graph">
-          <img src="https://i.stack.imgur.com/cPiLL.png" alt="Humidity Graph" />
+          {% comment %} <img src="https://i.stack.imgur.com/cPiLL.png" alt="Humidity Graph" /> {% endcomment %}
+          <canvas id="myChart3" width="200" height="60"></canvas>
+
         </div>
       </div>
     </main>
@@ -264,6 +273,106 @@
     }
 
     [...document.querySelectorAll('.toggle')].forEach(elem => elem.addEventListener("click", toggle));
+
+    var ctx1 = document.getElementById('myChart1').getContext('2d');
+    var ctx2 = document.getElementById('myChart2').getContext('2d');
+
+    var graphData1 = {
+      type: 'line',
+      data: {
+        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        datasets: [{
+          label: 'Temperature (*C)',
+          data: [12, 19, 3, 5, 2, 3],
+          fill: true,
+          backgroundColor: [
+            'rgba(155, 99, 132, 0.5)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+
+      }
+    }
+
+
+    var graphData2 = {
+      type: 'line',
+      data: {
+        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        datasets: [{
+          label: 'pH',
+          data: [12, 19, 3, 5, 2, 3],
+          fill: true,
+          backgroundColor: [
+            'rgba(55, 19, 132, 0.5)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+
+      }
+    }
+
+    var ctx3 = document.getElementById('myChart3').getContext('2d');
+
+    var graphData3 = {
+      type: 'line',
+      data: {
+        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        datasets: [{
+          label: 'Humidity',
+          data: [12, 19, 3, 5, 2, 3],
+          fill: true,
+          backgroundColor: [
+            'rgba(25, 99, 12, 0.5)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+
+      }
+    }
+
+    var myChart1 = new Chart(ctx1, graphData1);
+
+    var myChart2 = new Chart(ctx2, graphData2);
+
+    var myChart3 = new Chart(ctx3, graphData3);
+
+
+    var socket = new WebSocket("ws://localhost:8000/ws/graphs/");
+
+    socket.onmessage = function (e) {
+      var data = JSON.parse(e.data);
+      console.log(data);
+
+      var newgraphData1 = graphData1.data.datasets[0].data;
+      newgraphData1.shift();
+      newgraphData1.push(data.val1);
+
+      graphData1.data.datasets[0].data = newgraphData1;
+      myChart1.update();
+
+      var newgraphData2 = graphData2.data.datasets[0].data;
+      newgraphData2.shift();
+      newgraphData2.push(data.val2);
+
+      graphData2.data.datasets[0].data = newgraphData2;
+      myChart2.update();
+
+      
+      var newgraphData3 = graphData3.data.datasets[0].data;
+      newgraphData3.shift();
+      newgraphData3.push(data.val3);
+
+      graphData3.data.datasets[0].data = newgraphData3;
+      myChart3.update();
+      //document.querySelector("#msg").innerHTML = data.value;
+    }
   </script>
 </body>
 

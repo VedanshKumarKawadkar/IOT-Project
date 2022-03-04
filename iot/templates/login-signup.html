@@ -396,10 +396,19 @@
                 },
 
                 success: function (res) {
-                    console.log(res.message)
-                    // var error = $(res.message).find("#message_text")
-                    console.log(123134235235);
-                    $("#signup_msg").text(res.message)
+                    console.log(res.msg)
+                    if(!res.msg){
+                        console.log(123134235235);
+                        $(document).ajaxStop(function(){
+                            window.location.href = "/dashboard";
+                        });
+                    }
+                    else {
+                        $("#signup_msg").text(res.msg);
+                        setTimeout(function(){
+                            $('#signup_msg').hide()
+                        }, 3000)
+                    }
 
                 }
             })
@@ -424,7 +433,12 @@
                             window.location.href = "/dashboard";
                         });
                     }
-                    else $("#login_msg").text(res.msg);
+                    else{
+                        $("#login_msg").text(res.msg);
+                        setTimeout(function(){
+                            $('#login_msg').hide()
+                        }, 3000)
+                    }
 
                 }
             })
